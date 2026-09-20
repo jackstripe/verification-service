@@ -1,8 +1,7 @@
 package com.cesarfl.verificationservice.application;
 
-import com.cesarfl.verificationservice.integration.free.FreeCompany;
+import com.cesarfl.verificationservice.integration.premium.PremiumCompany;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.type.TypeReference;
@@ -13,27 +12,26 @@ import java.io.InputStream;
 import java.util.List;
 
 @Service
-public class LoadFreeCompanies {
+public class LoadPremiumCompanies {
 
     private final ObjectMapper objectMapper;
-    private List<FreeCompany> loadedData;
+    private List<PremiumCompany> loadedData;
 
-    @Autowired
-    public LoadFreeCompanies(ObjectMapper objectMapper) {
+    public LoadPremiumCompanies(ObjectMapper objectMapper, List<PremiumCompany> loadedData) {
         this.objectMapper = objectMapper;
+        this.loadedData = loadedData;
     }
 
     @PostConstruct
     public void init() throws IOException {
-        ClassPathResource resource = new ClassPathResource("free_service_companies-1.json");
+        ClassPathResource resource = new ClassPathResource("premium_service_companies-1.json");
         try (InputStream inputStream = resource.getInputStream()) {
-            this.loadedData = objectMapper.readValue(inputStream,
-                    new TypeReference<List<FreeCompany>>() {});
+            this.loadedData = objectMapper.readValue(inputStream, new TypeReference<>() { });
         }
     }
 
-    public List<FreeCompany> getData() {
+
+    public List<PremiumCompany> getData() {
         return loadedData;
     }
-
 }
