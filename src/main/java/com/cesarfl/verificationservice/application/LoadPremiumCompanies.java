@@ -17,9 +17,8 @@ public class LoadPremiumCompanies {
     private final ObjectMapper objectMapper;
     private List<PremiumCompany> loadedData;
 
-    public LoadPremiumCompanies(ObjectMapper objectMapper, List<PremiumCompany> loadedData) {
+    public LoadPremiumCompanies(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-        this.loadedData = loadedData;
     }
 
     @PostConstruct

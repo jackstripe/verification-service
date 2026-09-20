@@ -1,9 +1,7 @@
 package com.cesarfl.verificationservice.application;
 
-import com.cesarfl.verificationservice.integration.free.FreeCompany;
 import com.cesarfl.verificationservice.integration.premium.PremiumCompany;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Locale;
 
