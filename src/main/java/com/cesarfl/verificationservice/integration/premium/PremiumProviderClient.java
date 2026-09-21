@@ -12,25 +12,20 @@ import java.util.List;
 public class PremiumProviderClient {
 
     private final RestClient restClient;
-
     private  String premiumPath;
-    private String baseUrl;
+
 
     public PremiumProviderClient(
-                                    RestClient restClient,
-                                    @Value("${premiumcompany.searchurl}") String premiumPath,
-                                    @Value("${freecompany.base-url}")  String baseUrl) {
-        this.restClient = restClient;
-        this.baseUrl = baseUrl;
-        this.premiumPath = premiumPath;
-    }
-    @Autowired
-    public PremiumProviderClient(RestClient.Builder restClientBuilder) {
+            RestClient.Builder builder,
+            @Value("${premiumcompany.searchurl}") String premiumPath,
+            @Value("${freecompany.base-url}")  String baseUrl) {
 
-        this.restClient = restClientBuilder
+        this.premiumPath = premiumPath;
+        this.restClient = builder
                 .baseUrl(baseUrl)
                 .defaultHeader("Accept", "application/json")
                 .build();
+
     }
 
     public List<PremiumCompany> search(String query){

@@ -11,24 +11,27 @@ import java.util.List;
 public class FreeProviderClient {
 
     private final RestClient restClient;
-    @Value("${freecompany.searchurl}")
-    private  String freeUrl;
-    @Value("${freecompany.base-url}")
+
+    private  String freePath;
     String baseUrl;
 
-    @Autowired
-    public FreeProviderClient(RestClient.Builder restClientBuilder) {
+    public FreeProviderClient(
+            RestClient.Builder builder,
+            @Value("${freecompany.base-url}") String baseUrl,
+            @Value("${freecompany.searchurl}") String freePath) {
 
-        this.restClient = restClientBuilder
+        this.restClient = builder
                 .baseUrl(baseUrl)
                 .defaultHeader("Accept", "application/json")
                 .build();
+
+        this.freePath = freePath;
     }
 
     public List<FreeCompany> search(String query){
 
         return restClient.get()
-                .uri(uriBuilder -> uriBuilder.path(freeUrl)
+                .uri(uriBuilder -> uriBuilder.path(freePath)
                         .queryParam("query",query)
                         .build())
                 .retrieve()
