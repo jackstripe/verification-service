@@ -1,23 +1,39 @@
 Company Verification Service
 
-A small Spring Boot application for a company verification challenge. It uses the supplied JSON files to simulate free and premium company data providers.
+A small Spring Boot application created for a backend technical challenge. It simulates two external company providers and exposes a service that searches them using a fallback strategy.
 
-Current progress
-Both datasets are loaded from the application resources.
-Companies can be searched by identification number, ignoring case and surrounding spaces.
-GET /free-third-party?query=CJQ returns matching companies. This provider simulates a 40% chance of being unavailable.
-The premium search logic is implemented; its endpoint is next.
+How it works
 
-The main verification flow, provider fallback, and storage of verification results are still in progress.
+The backend calls the FREE provider first. If it returns no results or responds with 503 Service Unavailable, the request falls back to the PREMIUM provider.
+
+Only active companies are included in the final response. The first match is returned in result and any additional matches are included in otherResults.
+
+Every verification is stored in an in-memory H2 database and can be retrieved using its verification ID.
+
+Endpoints
+GET /free-third-party?query={text}
+GET /premium-third-party?query={text}
+GET /backend-service?verificationId={uuid}&query={text}
+GET /verifications/{verificationId}
+
+The FREE provider simulates a 40% failure rate and the PREMIUM provider simulates a 10% failure rate.
 
 Run locally
 
-Requires Java 21. On Windows, from the project directory:
+Java 21 is required.
 
 .\mvnw.cmd spring-boot:run
 
-To run the tests:
+Run the tests with:
 
-.\mvnw.cmd test
+.\mvnw.cmd clean test
 
-For example, try http://localhost:8080/free-third-party?query=CJQ. Because availability is simulated, the same request may return 503 Service Unavailable on some attempts.
+Example:
+
+GET /backend-service?verificationId=550e8400-e29b-41d4-a716-446655440000&query=CJQ
+
+The H2 database is stored in memory, so saved verifications are cleared when the application stops.
+
+To retrieve verifications:
+
+GET /verifications/550e8400-e29b-41d4-a716-446655440000

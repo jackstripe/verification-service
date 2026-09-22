@@ -1,8 +1,10 @@
 package com.cesarfl.verificationservice.application;
 
+import com.cesarfl.verificationservice.Service.VerificationStorageService;
 import com.cesarfl.verificationservice.api.dto.VerificationResponse;
 import com.cesarfl.verificationservice.api.dto.VerificationResult;
 import com.cesarfl.verificationservice.domain.CompanyResult;
+import com.cesarfl.verificationservice.domain.VerificationSource;
 import com.cesarfl.verificationservice.integration.free.FreeCompany;
 import com.cesarfl.verificationservice.integration.free.FreeProviderClient;
 import com.cesarfl.verificationservice.integration.premium.PremiumCompany;
@@ -18,44 +20,72 @@ public class VerificationService {
 
     private final PremiumProviderClient premiumProviderClient;
     private final FreeProviderClient freeProviderClient;
+    private final VerificationStorageService verificationStorageService;
 
-    public VerificationService(PremiumProviderClient premiumProviderClient, FreeProviderClient freeProviderClient) {
+    public VerificationService(PremiumProviderClient premiumProviderClient, FreeProviderClient freeProviderClient
+    ,VerificationStorageService verificationStorageService) {
         this.premiumProviderClient = premiumProviderClient;
         this.freeProviderClient = freeProviderClient;
+        this.verificationStorageService = verificationStorageService;
     }
 
-    public VerificationResponse verify(UUID verificationId, String query){
+    public VerificationResponse verify(UUID verificationId, String query) {
 
         List<FreeCompany> freeCompanyList;
-        List<PremiumCompany> premiumCompanyList;
 
         try {
             freeCompanyList = freeProviderClient.search(query);
-        } catch (RestClientResponseException ex) {
-            if (ex.getStatusCode().value() != 503) {
-                throw ex;
+        } catch (RestClientResponseException exception) {
+            if (exception.getStatusCode().value() != 503) {
+                throw exception;
             }
+
             freeCompanyList = List.of();
         }
+
+        VerificationResponse response;
+        VerificationSource source;
+
         if (!freeCompanyList.isEmpty()) {
-            return freeResponse(verificationId, query, freeCompanyList);
-        }
-
-
-        try{
-            premiumCompanyList = premiumProviderClient.search(query);
-        }catch (RestClientResponseException ex){
-            if (ex.getStatusCode().value() != 503) {
-                throw ex;
-            }
-            return new VerificationResponse(
+            response = freeResponse(
                     verificationId,
                     query,
-                    new VerificationResult("PROVIDERS_UNAVAILABLE", null),
-                    List.of());
-        }
-        return premiumResponse(verificationId, query, premiumCompanyList);
+                    freeCompanyList);
 
+            source = VerificationSource.FREE;
+
+        } else {
+            try {
+                List<PremiumCompany> premiumCompanyList =
+                        premiumProviderClient.search(query);
+
+                response = premiumResponse(
+                        verificationId,
+                        query,
+                        premiumCompanyList);
+
+                source = VerificationSource.PREMIUM;
+
+            } catch (RestClientResponseException exception) {
+                if (exception.getStatusCode().value() != 503) {
+                    throw exception;
+                }
+
+                response = new VerificationResponse(
+                        verificationId,
+                        query,
+                        new VerificationResult(
+                                "PROVIDERS_UNAVAILABLE",
+                                null),
+                        List.of());
+
+                source = VerificationSource.NONE;
+            }
+        }
+
+        verificationStorageService.save(response, query, source);
+
+        return response;
     }
 
     private VerificationResponse freeResponse(UUID verificationId, String query, List<FreeCompany> freeCompanyList){
