@@ -1,4 +1,4 @@
-package com.cesarfl.verificationservice.Service;
+package com.cesarfl.verificationservice.application;
 
 import com.cesarfl.verificationservice.api.dto.StoredVerificationResponse;
 import com.cesarfl.verificationservice.api.dto.VerificationResponse;
@@ -58,16 +58,16 @@ public class VerificationStorageService {
             VerificationEntity entity) {
 
         try {
-            VerificationResponse result =
+            VerificationResponse backendResponse =
                     objectMapper.readValue(
                             entity.getResultJson(),
                             VerificationResponse.class);
-
             return new StoredVerificationResponse(
                     entity.getVerificationId(),
                     entity.getQueryText(),
                     entity.getTimestamp(),
-                    result,
+                    backendResponse.result(),
+                    backendResponse.otherResults(),
                     entity.getSource());
 
         } catch (JacksonException exception) {

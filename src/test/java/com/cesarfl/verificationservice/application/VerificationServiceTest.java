@@ -1,6 +1,5 @@
 package com.cesarfl.verificationservice.application;
 
-import com.cesarfl.verificationservice.Service.VerificationStorageService;
 import com.cesarfl.verificationservice.api.dto.VerificationResponse;
 import com.cesarfl.verificationservice.domain.CompanyResult;
 import com.cesarfl.verificationservice.domain.VerificationSource;

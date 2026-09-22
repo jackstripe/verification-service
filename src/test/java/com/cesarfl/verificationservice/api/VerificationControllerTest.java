@@ -1,6 +1,6 @@
 package com.cesarfl.verificationservice.api;
 
-import com.cesarfl.verificationservice.Service.VerificationStorageService;
+import com.cesarfl.verificationservice.application.VerificationStorageService;
 import com.cesarfl.verificationservice.api.dto.StoredVerificationResponse;
 import com.cesarfl.verificationservice.api.dto.VerificationResponse;
 import com.cesarfl.verificationservice.api.dto.VerificationResult;
@@ -55,7 +55,8 @@ class VerificationControllerTest {
                         uuid,
                         "CIN",
                         Instant.parse("2026-09-22T06:55:18Z"),
-                        backendResponse,
+                        backendResponse.result(),
+                        backendResponse.otherResults(),
                         VerificationSource.FREE);
 
         when(verificationStorageService.findById(uuid))
@@ -67,10 +68,11 @@ class VerificationControllerTest {
                         .value(uuid.toString()))
                 .andExpect(jsonPath("$.queryText").value("CIN"))
                 .andExpect(jsonPath("$.source").value("FREE"))
-                .andExpect(jsonPath("$.result.result.status")
+                .andExpect(jsonPath("$.result.status")
                         .value("FOUND"))
-                .andExpect(jsonPath("$.result.result.company.cin")
-                        .value("CIN123"));
+                .andExpect(jsonPath("$.result.company.cin")
+                        .value("CIN123"))
+                .andExpect(jsonPath("$.otherResults").isEmpty());
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.cesarfl.verificationservice.integration.free;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -12,8 +11,7 @@ public class FreeProviderClient {
 
     private final RestClient restClient;
 
-    private  String freePath;
-    String baseUrl;
+    private final String freePath;
 
     public FreeProviderClient(
             RestClient.Builder builder,

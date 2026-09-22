@@ -1,6 +1,6 @@
 package com.cesarfl.verificationservice.api;
 
-import com.cesarfl.verificationservice.Service.VerificationStorageService;
+import com.cesarfl.verificationservice.application.VerificationStorageService;
 import com.cesarfl.verificationservice.api.dto.StoredVerificationResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
